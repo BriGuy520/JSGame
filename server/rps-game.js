@@ -35,10 +35,53 @@ class RPSGame {
 
 		if(turns[0] && turns[1]){
 			this._sendToPlayers("Game Over: " + turns.join(' > '));
+			this._getGameResult();
 			turns._turns = [null, null];
 			this._sendToPlayers("Next Round!!!");
 		}
 	}
+
+	_getGameResult() {
+
+		const p0 = this._decodeTurn(this._turns[0]);
+		const p1 = this._decodeTurn(this._turns[1]);
+
+		const distance = (p1 - p0 + 3) % 3;
+
+		switch (distance) {
+			case 0:
+				// draw
+				this._sendToPlayers('Draw!');
+				break;
+			case 1: 
+				// p0 won
+				this._sendWinMessage(this._players[0], this._players[1]);
+				break;
+			case 2:
+				// p1 won
+				this._sendWinMessge(this._players[1], this.players[0]);
+				break;
+		}
+	}
+
+	_sendWinMessage(winner, loser) {
+		winner.emit('message', 'You Won!');
+		loser.emit('message', 'You Lost!');
+	}
+
+	_decodeTurn(turn) {
+		switch (turn) {
+			case 'rock':
+				return 0;
+			case 'scissors':
+				return 1;
+			case 'paper':
+				return 2;
+			default:
+				throw new Error(`Could not decode turn ${turn}`);
+		}
+	}
+
 }
 
 module.exports = RPSGame;
